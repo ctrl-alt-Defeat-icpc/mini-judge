@@ -2,10 +2,9 @@ import os
 import subprocess
 import sys
 
-def run_test(input_file, expected_output_file):
-    executable = 'a.exe' if sys.platform == 'win32' else 'a.out'
+def run_test(input_file, expected_output_file, executable):
     with open(input_file, 'r') as f_in:
-        process = subprocess.Popen([os.path.join(os.getcwd(), executable)], stdin=f_in, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen([executable], stdin=f_in, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
     
     with open(expected_output_file, "r") as f_out:
@@ -23,6 +22,11 @@ def main():
         print(f"Test folder tc/{sys.argv[1]} does not exist!")
         sys.exit(1)
     
+    executable = os.path.join(os.getcwd(), 'a.exe' if sys.platform == 'win32' else 'a.out')
+    if not os.path.exists(executable):
+        print(f"executable file does not exist! compile a cpp file first!")
+        sys.exit(1)
+
     testNum = 1
     passNum = 0
     faildNum = 0
@@ -32,7 +36,7 @@ def main():
         if not os.path.exists(input_file) or not os.path.exists(expected_output_file):
             break
        
-        if run_test(input_file, expected_output_file):
+        if run_test(input_file, expected_output_file, executable):
             print(f"Test {testNum} passed!")
             passNum += 1
         else:
