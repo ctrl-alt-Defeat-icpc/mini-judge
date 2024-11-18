@@ -1,0 +1,31 @@
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore C++ build output files (like a.out and a.exe)
+a.out
+a.exe
+
+# Ignore VS Code specific files
+.vscode/
+
+# Ignore the tc folder (test cases folder)
+tc/
+
+# Ignore other build artifacts (for C++ and other compiled binaries)
+*.o
+*.obj
+*.exe
+*.out
+*.log
+
+# Ignore temporary or backup files (common for many editors)
+*~
+*.bak
+*.swp
+
+# Ignore other IDE specific files (if you're using any other IDEs)
+.idea/
+*.sublime-workspace
+*.sublime-project
