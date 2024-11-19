@@ -1,50 +1,27 @@
-import os
-import subprocess
-import sys
+import os, subprocess, sys
 
-def run_test(input_file, expected_output_file, executable):
-    with open(input_file, 'r') as f_in:
-        process = subprocess.Popen([executable], stdin=f_in, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-    
-    with open(expected_output_file, "r") as f_out:
-        expected_output = f_out.read()
+if len(sys.argv) != 2: 
+    sys.exit("Usage: python judge.py <folder_name>")
 
-    return stdout.decode().strip() == expected_output.strip()
+tc_folder = os.path.join(os.getcwd(), 'tc', sys.argv[1]) # you can change 'tc'
+exe = os.path.join(os.getcwd(), "a.exe" if sys.platform == 'win32' else "./a.out")
+if not os.path.exists(tc_folder): 
+    sys.exit(f"Directory {tc_folder} not found!")
+if not os.path.exists(exe):
+    sys.exit("Executable not found! Compile your C++ file.")
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python judge.py <folder_name>")
-        sys.exit(1)
-    
-    test_folder = os.path.join(os.getcwd(), 'tc', sys.argv[1])
-    if not os.path.exists(test_folder):
-        print(f"Test folder tc/{sys.argv[1]} does not exist!")
-        sys.exit(1)
-    
-    executable = os.path.join(os.getcwd(), 'a.exe' if sys.platform == 'win32' else 'a.out')
-    if not os.path.exists(executable):
-        print(f"executable file does not exist! compile a cpp file first!")
-        sys.exit(1)
-
-    testNum = 1
-    passNum = 0
-    faildNum = 0
-    while True:
-        input_file = os.path.join(test_folder, str(testNum) + '.in')
-        expected_output_file = os.path.join(test_folder, str(testNum) + '.ans')
-        if not os.path.exists(input_file) or not os.path.exists(expected_output_file):
-            break
-       
-        if run_test(input_file, expected_output_file, executable):
-            print(f"Test {testNum} passed!")
-            passNum += 1
-        else:
-            print(f"Test {testNum} failed!")
-            faildNum += 1
-        
-        testNum += 1
-    print(f'\n{passNum} test passed and {faildNum} test failed!')
-                
-if __name__ == '__main__':
-    main()
+t, p = 1, 0  # Test number, passed count
+while os.path.exists(os.path.join(tc_folder, str(t) + '.in')) and os.path.exists(os.path.join(tc_folder, str(t) + '.ans')):
+    print(f"Running Test {t}...")
+    with open(os.path.join(tc_folder, str(t) + '.in')) as fin, open(os.path.join(tc_folder, str(t) + '.ans')) as fans:
+        input_content = fin.read().strip()
+        expected = fans.read().strip()
+        proc = subprocess.run([exe], input=input_content, text=True, capture_output=True)
+        output = proc.stdout.strip()
+        if output == expected: 
+            print(f"Input:\n{input_content}\nExpected:\n{expected}\nTest {t} PASSED!\n")
+            p += 1
+        else: 
+            print(f"Input:\n{input_content}\nExpected:\n{expected}\nGot:\n{output}\nTest {t} FAILED!\n")
+    t += 1
+print(f"{p} test(s) passed, {t-p-1} test(s) failed!")
